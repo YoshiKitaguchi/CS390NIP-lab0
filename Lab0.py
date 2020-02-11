@@ -56,21 +56,16 @@ class NeuralNetwork_2Layer():
             yield l[i : i + n]
 
     # Training with backpropagation.
-    def train(self, xVals, yVals, epochs = 5, minibatches = True, mbs = 100): # epochs = 10000
-        print("hello")
-
-        # # xVals is flattened already so it has 28 x 28 = 784 columns and 60000 rows
+    def train(self, xVals, yVals, epochs = 500, minibatches = True, mbs = 100): # epochs = 10000 mbs = 100
+        xBatch_generator = self.__batchGenerator(xVals, mbs)
+        yBatch_generator = self.__batchGenerator(yVals, mbs)
+        # xVals is flattened already so it has 28 x 28 = 784 columns and 60000 rows
         for j in range (epochs):
-            mini_xVals = next(self.__batchGenerator(xVals, mbs))
-            mini_yVals = next(self.__batchGenerator(yVals, mbs))
-            # print (mini_xVals)
-            # print (mini_yVals)
+            mini_xVals = next(xBatch_generator)
+            mini_yVals = next(yBatch_generator)
 
             layer1 = self.__sigmoid(np.dot(mini_xVals, self.W1))
-            # print (layer1)
             layer2 = self.__sigmoid(np.dot(layer1, self.W2))
-            # print (layer2)
-
             loss = mini_yVals - layer2
             layer2_delta = loss * self.__sigmoidDerivative(layer2)
             layer1_error = np.dot (layer2_delta, self.W2.T)
@@ -78,10 +73,10 @@ class NeuralNetwork_2Layer():
             layer1_adjustment = np.dot(mini_xVals.T, layer1_delta) * self.lr  # this is the change in W1
             layer2_adjustment = np.dot(layer1.T, layer2_delta) * self.lr # this is the change in W2
 
-            self.W1 = self.W1 + layer1_adjustment;
+            self.W1 = self.W1 + layer1_adjustment
             self.W2 = self.W2 + layer2_adjustment
 
-        pass                                   #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
+        #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
 
     # Forward pass.
     def __forward(self, input):
@@ -122,10 +117,9 @@ def getRawData():
 
 def preprocessData(raw):
     ((xTrain, yTrain), (xTest, yTest)) = raw #TODO: Add range reduction here (0-255 ==> 0.0-1.0).
-    xTrain = xTrain / 255
-    yTrain = yTrain / 255
-    xTest = xTest / 255
-    yTest = yTest / 255
+    xTrain = (xTrain * 1.0) / 255.0
+    xTest = (xTest * 1.0) / 255.0
+
 
     yTrainP = to_categorical(yTrain, NUM_CLASSES)
     yTestP = to_categorical(yTest, NUM_CLASSES)
@@ -143,8 +137,7 @@ def trainModel(data):
     if ALGORITHM == "guesser":
         return None   # Guesser has no model, as it is just guessing.
     elif ALGORITHM == "custom_net":
-        # print("Building and training Custom_NN.")
-        # print("Not yet implemented.")                   #TODO: Write code to build and train your custon neural net.
+        #TODO: Write code to build and train your custon neural net.
         model = NeuralNetwork_2Layer(784, 10, 1000)
         model.train(xTrain_flat, yTrain)
         return model
@@ -163,10 +156,8 @@ def runModel(data, model):
     if ALGORITHM == "guesser":
         return guesserClassifier(data)
     elif ALGORITHM == "custom_net":
-        print("Testing Custom_NN.")
-        print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
-        return model.predict(flattened_data).astype(int)
-        # return guesserClassifier(data)
+        #TODO: Write code to run your custon neural net.
+        return to_categorical(np.argmax(model.predict(flattened_data), axis=1), NUM_CLASSES)
     elif ALGORITHM == "tf_net":
         print("Testing TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to run your keras neural net.
