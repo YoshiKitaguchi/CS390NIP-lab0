@@ -1,6 +1,7 @@
 
 import os
 import numpy as np
+from scipy.linalg import expm
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.utils import to_categorical
@@ -41,13 +42,13 @@ class NeuralNetwork_2Layer():
     # Activation function.
     def __sigmoid(self, x):
         #TODO: implement
-        return 1.0 / (1.0 + exp(-1 * x))
+        return 1.0 / (1.0 + np.exp(-1 * x))
 
 
     # Activation prime function.
     def __sigmoidDerivative(self, x):
         # pass   #TODO: implement
-        return __sigmoid(self, x) * (1.0 - __sigmoid(self, x));
+        return self.__sigmoid(x) * (1.0 - self.__sigmoid(x));
 
     # Batch generator for mini-batches. Not randomized.
     def __batchGenerator(self, l, n):
@@ -57,19 +58,28 @@ class NeuralNetwork_2Layer():
     # Training with backpropagation.
     def train(self, xVals, yVals, epochs = 5, minibatches = True, mbs = 100): # epochs = 10000
         print("hello")
+
         # # xVals is flattened already so it has 28 x 28 = 784 columns and 60000 rows
-        # mini_xVals = __batchGenerator(self, xVals, mbs)
-        # mini_yVals = __batchGenerator(self, yVals, mbs)
-        # for i in range (epochs):
-        #     layer1 = self.__sigmoid(np.dot(mini_xVals,self.W1))
-        #     layer2 = self.__sigmoid(np.dot(layer1, self.W2))
-        #     loss = np.zeros(shape = (mbs, 10))
-        #     loss = yVals - layer2
-        #     layer2_delta = loss * __sigmoidDerivative(layer2)
-        #     layer1_error = layer2_delta * self.W2.T
-        #     layer1_delta = layer1_error * __sigmoidDerivative(layer1)
-        #     layer1_adjustment = np.dot(xVals.T, layer1_delta) * self.lr  # this is the change in W1
-        #     layer2_adjustment = np.dot(layer1.T, layer2_delta) * self.lr # this is the change in W2
+        for j in range (epochs):
+            mini_xVals = next(self.__batchGenerator(xVals, mbs))
+            mini_yVals = next(self.__batchGenerator(yVals, mbs))
+            # print (mini_xVals)
+            # print (mini_yVals)
+
+            layer1 = self.__sigmoid(np.dot(mini_xVals, self.W1))
+            # print (layer1)
+            layer2 = self.__sigmoid(np.dot(layer1, self.W2))
+            # print (layer2)
+
+            loss = mini_yVals - layer2
+            layer2_delta = loss * self.__sigmoidDerivative(layer2)
+            layer1_error = np.dot (layer2_delta, self.W2.T)
+            layer1_delta = layer1_error * self.__sigmoidDerivative(layer1)
+            layer1_adjustment = np.dot(mini_xVals.T, layer1_delta) * self.lr  # this is the change in W1
+            layer2_adjustment = np.dot(layer1.T, layer2_delta) * self.lr # this is the change in W2
+
+            self.W1 = self.W1 + layer1_adjustment;
+            self.W2 = self.W2 + layer2_adjustment
 
         pass                                   #TODO: Implement backprop. allow minibatches. mbs should specify the size of each minibatch.
 
@@ -112,6 +122,11 @@ def getRawData():
 
 def preprocessData(raw):
     ((xTrain, yTrain), (xTest, yTest)) = raw #TODO: Add range reduction here (0-255 ==> 0.0-1.0).
+    xTrain = xTrain / 255
+    yTrain = yTrain / 255
+    xTest = xTest / 255
+    yTest = yTest / 255
+
     yTrainP = to_categorical(yTrain, NUM_CLASSES)
     yTestP = to_categorical(yTest, NUM_CLASSES)
     print("New shape of xTrain dataset: %s." % str(xTrain.shape))
@@ -128,11 +143,11 @@ def trainModel(data):
     if ALGORITHM == "guesser":
         return None   # Guesser has no model, as it is just guessing.
     elif ALGORITHM == "custom_net":
-        print("Building and training Custom_NN.")
-        print("Not yet implemented.")                   #TODO: Write code to build and train your custon neural net.
+        # print("Building and training Custom_NN.")
+        # print("Not yet implemented.")                   #TODO: Write code to build and train your custon neural net.
         model = NeuralNetwork_2Layer(784, 10, 1000)
         model.train(xTrain_flat, yTrain)
-        return None
+        return model
     elif ALGORITHM == "tf_net":
         print("Building and training TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to build and train your keras neural net.
@@ -143,13 +158,15 @@ def trainModel(data):
 
 
 def runModel(data, model):
+    # print (data.shape)
+    flattened_data = data.reshape(10000, 784)
     if ALGORITHM == "guesser":
         return guesserClassifier(data)
     elif ALGORITHM == "custom_net":
         print("Testing Custom_NN.")
         print("Not yet implemented.")                   #TODO: Write code to run your custon neural net.
-        return guesserClassifier(data)
-        # return None
+        return model.predict(flattened_data).astype(int)
+        # return guesserClassifier(data)
     elif ALGORITHM == "tf_net":
         print("Testing TF_NN.")
         print("Not yet implemented.")                   #TODO: Write code to run your keras neural net.
