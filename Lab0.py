@@ -23,8 +23,8 @@ IMAGE_SIZE = 784
 
 # Use these to set the algorithm to use.
 #ALGORITHM = "guesser"
-ALGORITHM = "custom_net"
-#ALGORITHM = "tf_net"
+# ALGORITHM = "custom_net"
+ALGORITHM = "tf_net"
 
 
 
@@ -90,6 +90,14 @@ class NeuralNetwork_2Layer():
         return layer2
 
 
+    def train_keras(self, x, y, eps = 5):
+        model = keras.Sequential([keras.layers.Flatten(), keras.layers.Dense(512, activation=tf.nn.relu), tf.keras.layers.Dense(10, activation=tf.nn.softmax)])
+        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        invert_categorical_y = np.argmax(y, axis=1)
+        model.fit(x, invert_categorical_y, epochs=eps, verbose=0 )
+        return model
+
+
 
 # Classifier that just guesses the class label.
 def guesserClassifier(xTest):
@@ -142,9 +150,11 @@ def trainModel(data):
         model.train(xTrain_flat, yTrain)
         return model
     elif ALGORITHM == "tf_net":
-        print("Building and training TF_NN.")
-        print("Not yet implemented.")                   #TODO: Write code to build and train your keras neural net.
-        return None
+        # print("Building and training TF_NN.")
+        # print("Not yet implemented.")                   #TODO: Write code to build and train your keras neural net.
+        model = NeuralNetwork_2Layer(784, 10, 10000)
+        keras_model = model.train_keras(xTrain, yTrain)
+        return keras_model
     else:
         raise ValueError("Algorithm not recognized.")
 
@@ -159,9 +169,8 @@ def runModel(data, model):
         #TODO: Write code to run your custon neural net.
         return to_categorical(np.argmax(model.predict(flattened_data), axis=1), NUM_CLASSES)
     elif ALGORITHM == "tf_net":
-        print("Testing TF_NN.")
-        print("Not yet implemented.")                   #TODO: Write code to run your keras neural net.
-        return None
+        #TODO: Write code to run your keras neural net.
+        return to_categorical(np.argmax(model.predict(data) , axis=1), NUM_CLASSES)
     else:
         raise ValueError("Algorithm not recognized.")
 
