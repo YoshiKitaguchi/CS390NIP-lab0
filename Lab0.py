@@ -5,6 +5,7 @@ from scipy.linalg import expm
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import f1_score, confusion_matrix
 import random
 
 
@@ -22,7 +23,7 @@ NUM_CLASSES = 10
 IMAGE_SIZE = 784
 
 # Use these to set the algorithm to use.
-#ALGORITHM = "guesser"
+# ALGORITHM = "guesser"
 # ALGORITHM = "custom_net"
 ALGORITHM = "tf_net"
 
@@ -178,11 +179,16 @@ def runModel(data, model):
 
 def evalResults(data, preds):   #TODO: Add F1 score confusion matrix here.
     xTest, yTest = data
+    y_true = np.argmax(yTest, axis=1)
+    y_pred = np.argmax(preds, axis=1)
     acc = 0
     for i in range(preds.shape[0]):
         if np.array_equal(preds[i], yTest[i]):   acc = acc + 1
     accuracy = acc / preds.shape[0]
-    print("Classifier algorithm: %s" % ALGORITHM)
+    print("Classifier algorithm: %s \n" % ALGORITHM)
+    print("Classifier confusion matrix: ")
+    print(confusion_matrix(y_true, y_pred))
+    print("Classifier F1 score (macro): " '{0:6f}' .format(f1_score(y_true, y_pred, average='macro')))
     print("Classifier accuracy: %f%%" % (accuracy * 100))
     print()
 
