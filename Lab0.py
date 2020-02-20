@@ -27,8 +27,9 @@ IMAGE_SIZE = 784
 # ALGORITHM = "custom_net"
 ALGORITHM = "tf_net"
 
-
-
+#########################################################################
+# the comment of implementation is at the README file of my github page #
+#########################################################################
 
 
 class NeuralNetwork_2Layer():
@@ -67,6 +68,7 @@ class NeuralNetwork_2Layer():
 
             layer1 = self.__sigmoid(np.dot(mini_xVals, self.W1))
             layer2 = self.__sigmoid(np.dot(layer1, self.W2))
+
             loss = mini_yVals - layer2
             layer2_delta = loss * self.__sigmoidDerivative(layer2)
             layer1_error = np.dot (layer2_delta, self.W2.T)
