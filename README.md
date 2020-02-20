@@ -1,6 +1,6 @@
 # CS390NIP-lab0
 
-This is the python file for 
+This is the python file for CS39NIP lab0
 # Custom neural net:
 1. implemented _sigmoid function
 
