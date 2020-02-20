@@ -2,6 +2,9 @@
 
 This is the python file for CS39NIP lab0
 # Custom neural net:
+
+Paragraph: implement sigmoid and its derivative and followed the slides and stackover flow the answer to do this part. Desicriptions at below. I added the code on wherever I need to add the code, which is already indicated in the skeleton code.
+
 1. implemented _sigmoid function
 
 2. implemented _sigmoidDerivative function (based on https://math.stackexchange.com/questions/78575/derivative-of-sigmoid-function-sigma-x-frac11e-x)
@@ -32,6 +35,8 @@ This is the python file for CS39NIP lab0
 
 
 #  TF neural net:
+
+paragraph: This section is the same as the previous section. I one that is special is I made a new function in the class. The details are at the below.
 
 1. create  train_keras function in NeuralNetwork_2Layer() class
 2. implement the code from slide 3 page 45
