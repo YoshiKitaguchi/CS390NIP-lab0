@@ -1,5 +1,6 @@
 # CS390NIP-lab0
 
+# Used tensorflow 2.0
 This is the python file for CS39NIP lab0
 # Custom neural net:
 
